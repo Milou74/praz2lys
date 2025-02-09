@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Se connecter au WiFi</title>
+    <link rel="icon" href="logo.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 90%; /* Limite la largeur à 90% de l'écran */
+            width: 400px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        img {
+            margin-top: 20px;
+            max-width: 100%; /* Rendre l'image responsive */
+            height: auto;
+        }
+        .manual-info {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        .manual-info strong {
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 20px; /* Réduit la taille du titre sur petits écrans */
+            }
+            .button {
+                padding: 12px 24px; /* Réduit la taille du bouton */
+                font-size: 14px;
+            }
+            .manual-info {
+                font-size: 16px; /* Ajuste la taille du texte manuel */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Connectez-vous au réseau WiFi</h1>
+        <p>Scannez le QR Code ci-dessous pour vous connecter au WiFi automatiquement.</p>
+        
+        <!-- QR Code généré par JavaScript -->
+        <img id="wifiQRCode" src="" alt="QR Code WiFi">
+
+        <p>Ou cliquez sur le bouton ci-dessous si vous préférez vous connecter manuellement.</p>
+        <a id="wifiLink" class="button" href="#">Se connecter au WiFi</a>
+
+        <!-- Affichage des informations manuelles pour ceux qui préfèrent se connecter à la main -->
+        <div class="manual-info">
+            <p><strong>Nom du réseau (SSID) :</strong> <span id="wifiSSID"></span></p>
+            <p><strong>Mot de passe :</strong> <span id="wifiPassword"></span></p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (chargement sous forme de module) -->
+    <script type="module">
+        // Importer les fonctions Firebase nécessaires
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // Votre configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3iKuaMHRmjC1zLon07zZyJeDLpJqtGl4",
+            authDomain: "prazdelysinfo.firebaseapp.com",
+            projectId: "prazdelysinfo",
+            storageBucket: "prazdelysinfo.firebasestorage.app",
+            messagingSenderId: "127517742905",
+            appId: "1:127517742905:web:0c0862d199b6b12210bae8",
+            measurementId: "G-5YENDWPM1H"
+        };
+
+        // Initialiser Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Récupérer les données WiFi depuis Firestore
+        async function getWiFiData() {
+            const docRef = doc(db, "identifiants", "9LJx9Bb75pDeeExSxB2O");
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const nom_wifi = data.nom_du_reseau;
+                const mdp_wifi = data.mdp_du_reseau;
+
+                // Générer le lien WiFi et le QR Code
+                const wifiLink = `WIFI:T:WPA;S:${nom_wifi};P:${mdp_wifi};;`;
+                const qrCodeURL = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(wifiLink)}&size=200x200`;
+
+                // Mettre à jour le QR Code et le lien
+                document.getElementById("wifiQRCode").src = qrCodeURL;
+                document.getElementById("wifiLink").href = wifiLink;
+
+                // Afficher les informations manuelles pour se connecter
+                document.getElementById("wifiSSID").textContent = nom_wifi;
+                document.getElementById("wifiPassword").textContent = mdp_wifi;
+            } else {
+                console.log("Aucun document trouvé");
+            }
+        }
+
+        // Appel de la fonction pour récupérer les données
+        getWiFiData().catch((error) => console.log("Erreur : ", error));
+    </script>
+</body>
+</html>
