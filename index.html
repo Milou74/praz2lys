@@ -80,7 +80,7 @@
         <img id="wifiQRCode" src="" alt="QR Code WiFi">
 
         <p>Ou cliquez sur le bouton ci-dessous si vous préférez vous connecter manuellement.</p>
-        <a id="wifiLink" class="button" href="#">Se connecter au WiFi</a>
+        <button id="wifiButton" class="button">Se connecter au WiFi</button>
 
         <!-- Affichage des informations manuelles pour ceux qui préfèrent se connecter à la main -->
         <div class="manual-info">
@@ -126,11 +126,14 @@
 
                 // Mettre à jour le QR Code et le lien
                 document.getElementById("wifiQRCode").src = qrCodeURL;
-                document.getElementById("wifiLink").href = wifiLink;
-
-                // Afficher les informations manuelles pour se connecter
                 document.getElementById("wifiSSID").textContent = nom_wifi;
                 document.getElementById("wifiPassword").textContent = mdp_wifi;
+
+                // Ajouter un événement au bouton pour ouvrir le lien WiFi
+                const wifiButton = document.getElementById("wifiButton");
+                wifiButton.addEventListener("click", () => {
+                    window.location.href = wifiLink;  // Ouvre le lien WiFi
+                });
             } else {
                 console.log("Aucun document trouvé");
             }
