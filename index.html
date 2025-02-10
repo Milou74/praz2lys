@@ -33,7 +33,7 @@
         .button {
             background-color: #4CAF50;
             color: white;
-            padding: 15px 32px;
+            padding: 15px;
             text-align: center;
             display: block;
             width: 100%;
@@ -65,32 +65,32 @@
 
     <div class="container">
         <h1>Connectez-vous au réseau WiFi</h1>
-        <p>Scannez le QR Code ci-dessous pour vous connecter au WiFi automatiquement.</p>
+        <p>Scannez le QR Code ci-dessous pour vous connecter automatiquement.</p>
         
         <!-- QR Code -->
         <div id="qrcode"></div>
 
         <p>Ou utilisez un des boutons ci-dessous.</p>
-        <button class="button" id="connectButton">Ouvrir les paramètres WiFi</button>
+        <button class="button" id="connectButton">Se connecter automatiquement</button>
         <button class="button" id="copyPasswordButton">Copier le mot de passe</button>
 
         <!-- Affichage des informations manuelles -->
         <div class="manual-info">
-            <p><strong>Nom du réseau (SSID) :</strong> <span id="wifiSSID"></span></p>
+            <p><strong>Nom du réseau :</strong> <span id="wifiSSID"></span></p>
             <p><strong>Mot de passe :</strong> <span id="wifiPassword"></span></p>
         </div>
     </div>
 
     <script>
-        // Informations WiFi en local
+        // Infos WiFi
         const nom_wifi = "Ski_FI_74";
         const mdp_wifi = "PrazSki@2517";
 
-        // Afficher les informations WiFi
+        // Affichage des infos WiFi
         document.getElementById("wifiSSID").textContent = nom_wifi;
         document.getElementById("wifiPassword").textContent = mdp_wifi;
 
-        // Générer le QR Code avec les infos WiFi
+        // Générer le QR Code
         const wifiLink = `WIFI:T:WPA;S:${nom_wifi};P:${mdp_wifi};;`;
         new QRCode(document.getElementById("qrcode"), {
             text: wifiLink,
@@ -98,16 +98,20 @@
             height: 200
         });
 
-        // Ouvrir les paramètres WiFi sur Android
+        // Bouton de connexion automatique
         document.getElementById("connectButton").addEventListener("click", function() {
             if (/android/i.test(navigator.userAgent)) {
-                window.location.href = "intent://com.android.settings#wifi";
+                // Ouvrir les paramètres WiFi sur Android
+                window.location.href = "intent://settings#wifi";
+            } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                // iOS ne permet pas l'ouverture directe → on informe l'utilisateur
+                alert("Sur iPhone, ouvrez les Réglages > Wi-Fi et entrez le mot de passe.");
             } else {
                 alert("Ouvrez vos paramètres WiFi et entrez le mot de passe.");
             }
         });
 
-        // Copier le mot de passe WiFi
+        // Copier le mot de passe
         document.getElementById("copyPasswordButton").addEventListener("click", function() {
             navigator.clipboard.writeText(mdp_wifi).then(() => {
                 alert("Mot de passe copié !");
