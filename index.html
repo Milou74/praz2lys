@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Se connecter au WiFi</title>
+    <title>Connexion WiFi</title>
     <link rel="icon" href="logo.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,133 +15,87 @@
             height: 100vh;
             margin: 0;
             background-color: #f4f4f4;
+            text-align: center;
         }
         .container {
-            text-align: center;
-            background-color: white;
+            background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-width: 90%; /* Limite la largeur à 90% de l'écran */
-            width: 400px;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+            width: 90%;
+            max-width: 400px;
         }
         .button {
             background-color: #4CAF50;
             color: white;
-            padding: 15px 32px;
+            padding: 15px 20px;
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
+            display: block;
+            margin: 10px auto;
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
             border: none;
-            margin-top: 20px;
         }
         .button:hover {
             background-color: #45a049;
         }
-        img {
-            margin-top: 20px;
-            max-width: 100%; /* Rendre l'image responsive */
-            height: auto;
-        }
-        .manual-info {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #333;
-        }
-        .manual-info strong {
-            font-weight: bold;
-        }
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 20px; /* Réduit la taille du titre sur petits écrans */
-            }
-            .button {
-                padding: 12px 24px; /* Réduit la taille du bouton */
-                font-size: 14px;
-            }
-            .manual-info {
-                font-size: 16px; /* Ajuste la taille du texte manuel */
-            }
+        #qrcode {
+            margin: 20px auto;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>Connectez-vous au réseau WiFi</h1>
-        <p>Scannez le QR Code ci-dessous pour vous connecter au WiFi automatiquement.</p>
+        <h1>Connexion WiFi</h1>
+        <p>Scannez le QR Code ou utilisez un des boutons ci-dessous.</p>
         
-        <!-- QR Code généré par JavaScript -->
-        <img id="wifiQRCode" src="" alt="QR Code WiFi">
+        <div id="qrcode"></div>
 
-        <p>Ou cliquez sur le bouton ci-dessous si vous préférez vous connecter manuellement.</p>
-        <button id="wifiButton" class="button">Se connecter au WiFi</button>
+        <p><strong>Nom du réseau (SSID) :</strong> <span id="wifiSSID"></span></p>
+        <p><strong>Mot de passe :</strong> <span id="wifiPassword"></span></p>
 
-        <!-- Affichage des informations manuelles pour ceux qui préfèrent se connecter à la main -->
-        <div class="manual-info">
-            <p><strong>Nom du réseau :</strong> <span id="wifiSSID"></span></p>
-            <p><strong>Mot de passe :</strong> <span id="wifiPassword"></span></p>
-        </div>
+        <button class="button" id="connectButton">Ouvrir les paramètres WiFi</button>
+        <button class="button" id="copyPasswordButton">Copier le mot de passe</button>
     </div>
 
-    <!-- Firebase SDK (chargement sous forme de module) -->
-    <script type="module">
-        // Importer les fonctions Firebase nécessaires
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    <script>
+        // Informations WiFi en local
+        const nom_wifi = "Ski_FI_74";
+        const mdp_wifi = "PrazSki@2517";
 
-        // Votre configuration Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyC3iKuaMHRmjC1zLon07zZyJeDLpJqtGl4",
-            authDomain: "prazdelysinfo.firebaseapp.com",
-            projectId: "prazdelysinfo",
-            storageBucket: "prazdelysinfo.firebasestorage.app",
-            messagingSenderId: "127517742905",
-            appId: "1:127517742905:web:0c0862d199b6b12210bae8",
-            measurementId: "G-5YENDWPM1H"
-        };
+        // Afficher les informations WiFi
+        document.getElementById("wifiSSID").textContent = nom_wifi;
+        document.getElementById("wifiPassword").textContent = mdp_wifi;
 
-        // Initialiser Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // Générer un QR Code avec les infos WiFi
+        const wifiLink = `WIFI:T:WPA;S:${nom_wifi};P:${mdp_wifi};;`;
+        new QRCode(document.getElementById("qrcode"), {
+            text: wifiLink,
+            width: 200,
+            height: 200
+        });
 
-        // Récupérer les données WiFi depuis Firestore
-        async function getWiFiData() {
-            const docRef = doc(db, "identifiants", "9LJx9Bb75pDeeExSxB2O");
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                const nom_wifi = data.nom_du_reseau;
-                const mdp_wifi = data.mdp_du_reseau;
-
-                // Générer le lien WiFi et le QR Code
-                const wifiLink = `WIFI:T:WPA;S:${nom_wifi};P:${mdp_wifi};;`;
-                const qrCodeURL = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(wifiLink)}&size=200x200`;
-
-                // Mettre à jour le QR Code et le lien
-                document.getElementById("wifiQRCode").src = qrCodeURL;
-                document.getElementById("wifiSSID").textContent = nom_wifi;
-                document.getElementById("wifiPassword").textContent = mdp_wifi;
-
-                // Ajouter un événement au bouton pour ouvrir le lien WiFi
-                const wifiButton = document.getElementById("wifiButton");
-                wifiButton.addEventListener("click", () => {
-                    window.location.href = wifiLink;  // Ouvre le lien WiFi
-                });
+        // Ouvrir les paramètres WiFi sur Android
+        document.getElementById("connectButton").addEventListener("click", function() {
+            if (/android/i.test(navigator.userAgent)) {
+                window.location.href = "intent://com.android.settings#wifi"; // Ouvre les paramètres WiFi sur Android
             } else {
-                console.log("Aucun document trouvé");
+                alert("Ouvrez vos paramètres WiFi manuellement et entrez le mot de passe.");
             }
-        }
+        });
 
-        // Appel de la fonction pour récupérer les données
-        getWiFiData().catch((error) => console.log("Erreur : ", error));
+        // Copier le mot de passe WiFi
+        document.getElementById("copyPasswordButton").addEventListener("click", function() {
+            navigator.clipboard.writeText(mdp_wifi).then(() => {
+                alert("Mot de passe copié !");
+            }).catch(err => {
+                console.error("Erreur de copie : ", err);
+            });
+        });
+
     </script>
+
 </body>
 </html>
