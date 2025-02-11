@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Adaptative</title>
+    <style>
+        /* Styles généraux */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Contenu principal */
+        #content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Navbar en bas (visible sur mobile seulement) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background: #0f3460;
+            padding: 10px 0;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            flex: 1;
+        }
+
+        .nav-btn:hover {
+            background: #16213e;
+            cursor: pointer;
+        }
+
+        /* Masquer la navbar sur les grands écrans */
+        @media screen and (min-width: 768px) {
+            .bottom-nav {
+                display: none;
+            }
+
+            /* Style différent sur ordinateur (ex: affichage en grille) */
+            #content {
+                display: flex;
+                justify-content: space-evenly;
+            }
+
+            .page {
+                display: block;
+                width: 30%;
+                border: 1px solid #ffffff33;
+                padding: 20px;
+                border-radius: 10px;
+                background: #0f3460;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Contenu principal -->
+    <div id="content">
+        <section id="jeux" class="page active">
+            <h1>Jeux</h1>
+            <p>Liste des jeux disponibles...</p>
+        </section>
+
+        <section id="parametres" class="page">
+            <h1>Paramètres</h1>
+            <p>Réglez vos préférences...</p>
+        </section>
+
+        <section id="virement" class="page">
+            <h1>Virement</h1>
+            <p>Effectuez un virement sécurisé...</p>
+        </section>
+    </div>
+
+    <!-- Barre de navigation (mobile seulement) -->
+    <nav class="bottom-nav">
+        <button class="nav-btn" data-target="jeux">🎮<br>Jeux</button>
+        <button class="nav-btn" data-target="parametres">⚙️<br>Paramètres</button>
+        <button class="nav-btn" data-target="virement">💰<br>Virement</button>
+    </nav>
+
+    <script>
+        // Sélection des boutons et des sections
+        const buttons = document.querySelectorAll(".nav-btn");
+        const pages = document.querySelectorAll(".page");
+
+        // Fonction pour changer de section sur mobile
+        buttons.forEach(button => {
+            button.addEventListener("click", () => {
+                const target = button.getAttribute("data-target");
+
+                // Masquer toutes les pages
+                pages.forEach(page => page.classList.remove("active"));
+
+                // Afficher la page sélectionnée
+                document.getElementById(target).classList.add("active");
+            });
+        });
+    </script>
+
+</body>
+</html>
